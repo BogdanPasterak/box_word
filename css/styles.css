@@ -1,0 +1,307 @@
+/* main elements */
+html,
+body,
+#container,
+#my-col-left,
+#my-col-right {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  width: 100vw;
+  height: 100vh;
+}
+
+body {
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
+  padding: 8px;
+  background-image: repeating-linear-gradient(20deg, #dde , #ded 33%, #edd 66%);;
+}
+
+#container {
+  font-family: 'Acme';
+  font-size: 1.4em;
+  font-weight: bold;
+  min-width: 300px;
+  max-width: 1270px;
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  margin: auto;
+}
+
+#my-col-left {
+  display: flex;
+  flex: 0 1 auto;
+  flex-flow: column;
+  justify-content: space-between;
+}
+
+#my-col-right {
+  width: 0%;
+  display: flex;
+  flex: 0 1 auto;
+  flex-flow: column;
+}
+
+.my-part {
+  display: flex;
+  flex: 0 1 auto;
+  flex-flow: row;
+  justify-content: space-between;
+  padding: 7px 0;
+  width: 100%;
+}
+
+#playground {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.square {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  display: flex;
+  background-size: contain;
+  background-image: url("../img/marble.png");
+}
+
+
+.square h1 {
+  pointer-events: none;
+  font-size: 3em;
+}
+
+/* board of game */
+#board {
+  margin: auto;
+  display: flex;
+  flex-flow: wrap;
+}
+
+/* columns or rows inside board */
+.my-col {
+  display: flex;
+  flex: 0 1 auto;
+  flex-flow: column;
+  justify-content: center;
+}
+
+.my-row {
+  display: flex;
+  flex: 0 1 auto;
+  flex-flow: row;
+  justify-content: center;
+}
+
+/* single card */
+.card-box {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  perspective: 700px;
+  margin: 0;
+  padding: 0;
+}
+
+.card {
+  width: 96%;
+  height: 96%;
+  position: absolute;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  margin: 2%;
+  padding: 0;
+}
+
+.card figure {
+  margin: 0;
+  display: block;
+  position: absolute;
+  width: 96%;
+  height: 96%;
+  margin: 2%;
+  padding: 0;
+  backface-visibility: hidden;
+  border-radius: 5%;
+}
+
+.card img {
+  width: 90%;
+  height: 90%;
+  margin: 5%;
+}
+
+.card .front {
+  background-image: url("../img/bg.jpg");
+  background-repeat: no-repeat;
+  background-size: 100%;
+  transform: rotateY( 180deg );
+}
+
+.card .back {
+  background-image: url("../img/bgr.jpg");
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+
+.flipped {
+  transform: rotateY( 180deg );
+}
+
+
+h1 {
+  margin: auto;
+}
+
+p {
+  margin: 0;
+}
+
+footer {
+  text-align: center;
+  display: flex;
+  flex-flow: row;
+  justify-content: space-around;
+}
+
+footer a {
+  text-decoration: none;
+  color: inherit;
+}
+
+span {
+  display: inline-block;
+  white-space: pre;
+  margin: 7px 0;
+}
+
+footer span {
+  margin: 7px 10px;
+}
+
+img {
+  width: 100%;
+}
+
+button,
+select,
+option {
+  font-family: 'Fredericka the Great', cursive;
+  font-size: 1.0em;
+  font-weight: bold;
+  text-align-last: center;
+}
+
+/* line stylization */
+hr {
+  height: 12px;
+  width: 100%;
+  border: 0;
+  margin: 0;
+  box-shadow: inset 0 12px 12px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* divs for hat*/
+.hat-box {
+  position: absolute;
+  top: 710px;
+  left: 0;
+  pointer-events: none;
+}
+
+.hat-X {
+  position: relative;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  animation-name: moveX;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+}
+
+.hat-Y {
+  position: relative;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  animation-name: moveY0;
+  animation-duration: 1s;
+  animation-timing-function: ease-out;
+}
+
+.hat {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 70px;
+  height: 70px;
+  pointer-events: none;
+  background-image: url("../img/hat0.png");
+  background-size: contain;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+}
+
+.win {
+  width: 70%;
+  margin: 10% 15%;
+  padding: 5% 0;
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.5);
+  align-content: center;
+  top: 0;
+  left: 0;
+}
+
+.again {
+  position: relative;
+  margin: 0;
+  left: 50%;
+  transform: translate(-50%);
+  font-family: 'Fredericka the Great', cursive;
+  font-size: 3em;
+  font-weight: bold;
+  text-align: center;
+}
+
+.again p {
+  padding: 0.2em 0;
+}
+
+.btn-again {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  padding: 0.2em 0.7em;
+}
+
+
+/* breakpoints */
+/* change audience */
+@media screen and (max-width: 720px) {
+  #container {
+    font-size: 0.9em;
+  }
+  button,
+  select,
+  option {
+    font-size: 0.8em;
+  }
+  .again {
+    font-size: 2em;
+  }
+}
+
+@media screen and (max-width: 600px), (max-height: 600px) {
+  .again {
+    font-size: 1.4em;
+  }
+}
+
