@@ -8,8 +8,10 @@
 const GAME = {
   side: 0,
   blocks: [],
+  letters: [],
   pos: [],
-  words: []
+  words: [],
+  matchedWord: []
   /*
 
 
@@ -30,26 +32,6 @@ const GAME = {
   rectAudience: undefined,
   rectBoard: undefined
   */
-};
-// An array with the layout of cards
-const arrangement = [
-  [2, 3, 3, 3, 3, 4, 3, 3, 4, 4, 5, 5, 5, 6],
-  [2, 3, 2, 3, 4, 4, 4, 4, 4, 5, 5, 5, 6, 6],
-  [0, 0, 3, 3, 3, 4, 4, 4, 4, 5, 5, 6, 6, 6],
-  [0, 0, 0, 0, 0, 0, 3, 4, 4, 4, 5, 5, 5, 6]
-];
-
-// Calculation of some game parameters
-GAME.set = function() {
-  this.couples = parseInt($('#couples').val());
-  this.stakes = parseInt($('#stakes').val());
-  this.col = 2 + (this.stakes > 6) + (this.stakes > 12);  // true == 1, false == 0
-  this.row = 2 + (this.stakes > 4) + (this.stakes > 9) + (this.stakes > 16) + (this.stakes > 20);
-  this.landscape = ($(this.board).width() > $(this.board).height());
-  // calculate size of cards
-  const cW = this.board.clientWidth / ((this.landscape) ? this.row : this.col);
-  const cH = this.board.clientHeight / ((this.landscape) ? this.col : this.row);
-  this.size = ((cW > cH) ? cH : cW) | 0;
 };
 
 
@@ -75,6 +57,46 @@ $(function() {
   reorganization();
   //choiceCouples();
 });
+
+// TODO: start again
+const restart = () => {
+  // DB words
+  if (GAME.words.length == 0) {
+    GAME.words = JSON.parse(words);
+  }
+  // array letters (matchedWord => possible layouts)
+  GAME.letters = randomLetters();
+  // draw blocks
+  resetBoard();
+};
+
+// TODO: Function for redrawing the board
+const resetBoard = () => {
+  const board = document.getElementById('board');
+  // clear board
+  board.innerHTML = '';
+  GAME.blocks = [];
+  GAME.pos = new Array(16);
+
+  // build 15 blocks and set position
+  for(var index = 0; index < 15; index++) {
+    const block = document.createElement('DIV');
+    block.classList.add('square');
+    block.setAttribute('id', 's' + index);
+    const letter = document.createElement('H1');
+    // letter.addEventListener('onselect', (e) => e.preventDefault());
+    letter.appendChild(document.createTextNode(GAME.letters[index]));
+    block.append(letter);
+    block.style.width = GAME.side +'px';
+    block.style.height = GAME.side +'px';
+    block.addEventListener("click", clickLeter);
+    board.append(block);
+    GAME.blocks.push(block);
+    GAME.pos[index] = index;
+    console.log();
+  }
+  GAME.pos[15] = -1;
+};
 
 // TODO: resize window ( turning the phone )
 const reorganization = () => {
@@ -109,28 +131,13 @@ const reorganization = () => {
     GAME.side = size / 4;
     board.style.width = size + "px";
     board.style.height = size + "px";
-    //console.log(size);
-
     // size of block
-    const blocks = document.getElementsByClassName('square');
-
-
     GAME.blocks.forEach((block, index) => {
       block.style.width = GAME.side +'px';
       block.style.height = GAME.side +'px';
       move(index);
     });
-
   }
-
-
-  // saving the size of audience and board
-  //GAME.rectBoard = $('.board')[0].getBoundingClientRect();
-
-  // repaint screen
-  //GAME.set();
-  //resetBoard();
-  //setingCards();
 };
 
 const clickLeter = (e) => {
@@ -138,6 +145,7 @@ const clickLeter = (e) => {
   const nr = parseInt(e.target.id.slice(1));
   const pos = GAME.pos.indexOf(nr);
   const neigh = neighbors(pos);
+  let word, n;
 
   if (neigh.includes(-1)) {
     const where = GAME.pos.indexOf(-1);
@@ -147,6 +155,17 @@ const clickLeter = (e) => {
     move(nr);
   }
 
+  for (let row = 0; row < 4; row++) {
+    word = "";
+    for (let col = 0; col < 4; col++) {
+      n = row * 4 +col;
+      if (GAME.pos[n] != -1) {
+       word += GAME.letters[GAME.pos[n]];
+     }
+    }
+    if (GAME.matchedWord.includes(word))
+      console.log(word);
+  }
 };
 
 // set block on position in array GAME.pos
@@ -156,7 +175,6 @@ const move = (nr) => {
   GAME.blocks[nr].style.left = (((where % 4) - (nr % 4)) * GAME.side) + 'px';
   GAME.blocks[nr].style.top = ((((where / 4) | 0) - ((nr / 4) | 0)) * GAME.side) + 'px';
 };
-
 
 // return array neighbors (-1 empty)
 const neighbors = (p) => {
@@ -176,7 +194,8 @@ const randomLetters = () => {
   const vowel = ['a','e','i','o','u'];
   const bcd = 'bcdfghjklmnpqrstvwxyz';
   const l = [];
-  let v = 0, c = 0, char, p;
+  let v = 0, c = 0, char, p, exp, ex2, ex3;
+  let matchedWord;
 
   const word = GAME.words[((Math.random() * GAME.words.length) | 0)].w;
   document.getElementById('text').value = word;
@@ -197,7 +216,7 @@ const randomLetters = () => {
   for (var i = l.length; i < 15; i++) {
     l.push(bcd.charAt((Math.random() * bcd.length) | 0));
   }
-  //shuffle
+  //shuffle letter
   for (var i = 0; i < 15; i++) {
     p = l[i];
     c = (Math.random() * 15) | 0;
@@ -205,259 +224,28 @@ const randomLetters = () => {
     l[c] = p;
   }
 
-  //console.log(l + '  ' + v + '  ' + p + '  ' + l.length);
+  // filter mached words
+  matchedWord = GAME.words.filter(word => (
+    word.w.split('').map( le => l.includes(le)).filter(b => !b).length == 0
+  ));
+
+  // if any letter repeats itself
+  // and there is no such thing for it, throw away the word
+  matchedWord = matchedWord.filter(word => (
+    exp = new RegExp(word.w.charAt(0),"g"),
+    ex2 = new RegExp(word.w.charAt(1),"g"),
+    ex3 = new RegExp(word.w.charAt(2),"g"),
+    ! ((word.w.match(exp).length > l.join('').match(exp).length) ||
+    (word.w.match(ex2).length > l.join('').match(ex2).length) ||
+    (word.w.match(ex3).length > l.join('').match(ex3).length))
+  ));
+
+  // json to array
+  GAME.matchedWord = matchedWord.map(word => word.w);
+
   return l;
 };
 
-// TODO: start again
-const restart = () => {
-
-  if (GAME.words.length == 0) {
-    GAME.words = JSON.parse(words);
-  }
-  GAME.letters = randomLetters();
-  console.log(GAME.letters);
-  // turn off owation
-  // if (cards.intervalOvations != undefined) {
-  //   clearInterval(cards.intervalOvations);
-  //   cards.intervalOvations = undefined;
-  // }
-  // draw and set new cards
-  resetBoard();
-  // drawingCards();
-  // setingCards();
-};
-
-
-// TODO: Function for redrawing the board
-const resetBoard = () => {
-  const board = document.getElementById('board');
-  const abc = 'abcdefghijklmnopqrstuvwxyz';
-  // clear board
-  board.innerHTML = '';
-  GAME.blocks = [];
-  GAME.pos = new Array(16);
-
-  // build 15 blocks and set position
-  for(var index = 0; index < 15; index++) {
-    const block = document.createElement('DIV');
-    block.classList.add('square');
-    block.setAttribute('id', 's' + index);
-    const letter = document.createElement('H1');
-    // letter.addEventListener('onselect', (e) => e.preventDefault());
-    letter.appendChild(document.createTextNode(GAME.letters[index]));
-    block.append(letter);
-    block.addEventListener("click", clickLeter);
-    board.append(block);
-    GAME.blocks.push(block);
-    GAME.pos[index] = index;
-    console.log();
-  }
-  GAME.pos[15] = -1;
-};
-
-// TODO: drawing cards
-const drawingCards = () => {
-  let rnd;
-
-  // clear seting
-  for (let i = 0; i < 24; i++){
-    cards.No[i] = 0;
-    cards.flipp[i] = false;
-  }
-  cards.search[2] = -1;
-  cards.search[1] = -1;
-  cards.search[0] = -1;
-  cards.moves = 0;
-  cards.time = 0;
-  // stop clock
-  if (cards.intervalID != undefined) {
-    clearInterval(cards.intervalID);
-    cards.intervalID = undefined;
-  }
-  // clear visible elements
-  $('#moves').html('0');
-  $('#time').html('0:00');
-  calcStars();
-
-  // fill colection
-  for (let i = 1; i <= cards.stakes / cards.couples; i++){
-    // i -> number of sets
-    for (let j = 0; j < cards.couples; j++){
-      // j -> card number in the set
-      do {
-        rnd = (Math.random() * cards.stakes) | 0;
-      } while (cards.No[rnd] != 0);
-      // draw until you find an empty space
-      cards.No[rnd] = i;
-    }
-  }
-};
-
-// TODO: setting cards according to the pattern
-const setingCards = () => {
-  // to which row or column to add (string of class and no.)
-  let who;
-  // index in the pattern
-  const which = (((cards.stakes - 4) / 2) | 0) + (cards.stakes > 8) + (cards.stakes > 14) + (cards.stakes > 20);
-  // index of card
-  let index = 0;
-
-  for (let i = 0; i < cards.col; i++){
-    // i -> cloumn or row (depending on the view)
-    who = '.my-' + ((cards.landscape) ? 'row' : 'col') + ':eq(' + i + ')';
-    for (let j = 0; j < arrangement[i][which]; j++) {
-      // j -> position in a row or column
-      // creates a card
-      let card = $(buildCard(index));
-      // adding click event with prevent dragable
-      $(card).children().on("mouseup mousedown", function(event) {
-        event.preventDefault();
-        if (event.type == "mouseup"){
-          flipp(this);
-        }
-      });
-      // set card
-      $(who).append(card);
-      index++
-    }
-  }
-  // set size of cards
-  $('.card-box').width(cards.size + 'px');
-  $('.card-box').height(cards.size + 'px');
-};
-
-// TODO: Card rollover function
-const flipp = (sender) => {
-  // variable
-  const index = parseInt($(sender).attr('id'));
-  const front = ! cards.flipp[index];
-  let id0, id1, id2;
-
-  // if I check
-  if (front){
-    // next move
-    cards.moves++;
-    // show muves
-    $('#moves').html(cards.moves);
-    // turn the card
-    $(sender).toggleClass('flipped');
-    cards.flipp[index] = front;
-    // start clock if stoped
-    if (cards.intervalID == undefined ){
-      cards.intervalID = setInterval(addSecond, 1000);
-    }
-    // are they any reversed ?
-    if (cards.search[0] >= 0) {
-      // if the first one is the same ?
-      if (cards.No[index] == cards.No[cards.search[0]]) {
-        // all included ?
-        if (cards.couples == 2 || (cards.couples == 3 && cards.search[1] >= 0) || (cards.couples == 4 && cards.search[1] >= 0 && cards.search[2] >= 0)) {
-          // reset the search
-          cards.search[2] = -1;
-          cards.search[1] = -1;
-          cards.search[0] = -1;
-          // hurra
-          for (let i = 0; i < ((Math.random() * 10) | 0) + 7; i++) {
-            setTimeout(function() {
-              throwHat();
-            },(Math.random() * 1500) | 0);
-          }
-          // is this the last set ?
-          if ($('.flipped').length == cards.stakes) {
-            // stop clock
-            if (cards.intervalID != undefined) {
-              clearInterval(cards.intervalID);
-              cards.intervalID = undefined;
-            }
-            // ovations !!!
-            if (cards.intervalOvations == undefined ){
-              cards.intervalOvations = setInterval(ovations, 200);
-            }
-            win();
-          }
-        } else {
-        // not all in the set, enter and search further
-          if (cards.search[1] == -1) {
-            // second
-            cards.search[1] = index;
-          } else {
-            // or third
-            cards.search[2] = index;
-          }
-        }
-      } else {
-      // not the same
-        // id of previous searches
-        id0 = leadingZero(cards.search[0]);
-        if (cards.couples > 2 && cards.search[1] >= 0) {
-          id1 = leadingZero(cards.search[1]);
-        }
-        if (cards.couples == 4 && cards.search[2] >= 0) {
-          id2 = leadingZero(cards.search[2]);
-        }
-        // cover the wrong one
-        setTimeout(function() {
-          $(sender).toggleClass('flipped');
-          $('#' + id0).toggleClass('flipped');
-          if (id1 != undefined) {
-            $('#' + id1).toggleClass('flipped');
-          }
-          if (id2 != undefined) {
-            $('#' + id2).toggleClass('flipped');
-          }
-        }, 600);
-        // start searching again
-        cards.flipp[index] = false;
-        cards.flipp[cards.search[0]] = false;
-        cards.search[0] = -1;
-        if (id1 != undefined) {
-          cards.flipp[cards.search[1]] = false;
-          cards.search[1] = -1;
-        }
-        if (id2 != undefined) {
-          cards.flipp[cards.search[2]] = false;
-          cards.search[2] = -1;
-        }
-        // the audience can also be wrong !!!!
-        if (Math.random() < 0.2) {
-          throwHat();
-        }
-      }
-    // start looking for a pair
-    } else {
-      cards.search[0] = index;
-    }
-  }
-
-};
-
-// TODO: Creates a card
-const buildCard = (nr) => {
-  const pattern = leadingZero(cards.No[nr]);
-  const index = leadingZero(nr);
-  let card = '';
-
-  card += '<div class="card-box">';
-  card += '<div class="card';
-  // if it was rotated, turn it
-  if (cards.flipp[nr]){
-    card += ' flipped';
-  }
-  card += '" id="' + index + '">';
-
-  card += '<figure class="back">';
-  card += '<img src="img/bowl.png">';
-  card += '</figure>';
-
-  card += '<figure class="front">';
-  card += '<img src="img/fruti' + pattern + '.png">';
-  card += '</figure>';
-
-  card += '</div>'; // end card
-  card += '</div>'; // end card-box
-  return card;
-};
 
 // TODO: Time counting timer
 const addSecond = () => {
