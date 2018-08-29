@@ -14,23 +14,9 @@ const GAME = {
   matchedWord: []
   /*
 
-
-  couples: 0,
-  stakes: 0,
-  col: 0,
-  row: 0,
-  size: 0,
-  moves: 0,
   time: 0,
   intervalID: undefined,
   intervalOvations: undefined,
-  landscape: true,
-  No: Array(24),
-  flipp: Array(24),
-  search: Array(3),
-  sizeHat: 70,
-  rectAudience: undefined,
-  rectBoard: undefined
   */
 };
 
@@ -64,10 +50,13 @@ const restart = () => {
   if (GAME.words.length == 0) {
     GAME.words = JSON.parse(words);
   }
-  // array letters (matchedWord => possible layouts)
-  GAME.letters = randomLetters();
-  // draw blocks
-  resetBoard();
+  do {
+    // array letters (matchedWord => possible layouts)
+    GAME.letters = randomLetters();
+    // draw blocks
+    resetBoard();
+  } while ( win() );
+  // not too easy
 };
 
 // TODO: Function for redrawing the board
@@ -84,16 +73,16 @@ const resetBoard = () => {
     block.classList.add('square');
     block.setAttribute('id', 's' + index);
     const letter = document.createElement('H1');
-    // letter.addEventListener('onselect', (e) => e.preventDefault());
     letter.appendChild(document.createTextNode(GAME.letters[index]));
     block.append(letter);
     block.style.width = GAME.side +'px';
     block.style.height = GAME.side +'px';
-    block.addEventListener("click", clickLeter);
+    block.style.backgroundImage = 'url(./img/m' + (10 + index) + '.png)';
+    block.addEventListener('mousedown', clickLeter);
+    block.addEventListener('touchstart', clickLeter);
     board.append(block);
     GAME.blocks.push(block);
     GAME.pos[index] = index;
-    console.log();
   }
   GAME.pos[15] = -1;
 };
@@ -154,6 +143,14 @@ const clickLeter = (e) => {
     GAME.pos[pos] = -1;
     move(nr);
   }
+  if (word = win())
+    console.log(word);
+
+};
+
+// check if win
+const win = () => {
+let n, word;
 
   for (let row = 0; row < 4; row++) {
     word = "";
@@ -163,9 +160,14 @@ const clickLeter = (e) => {
        word += GAME.letters[GAME.pos[n]];
      }
     }
-    if (GAME.matchedWord.includes(word))
-      console.log(word);
+    if (GAME.matchedWord.includes(word)){
+      for (var i = row * 4; i < row * 4 + 4; i++) {
+        GAME.blocks[GAME.pos[i]].style.color = 'red';
+      }
+      return word;;
+    }
   }
+  return false;
 };
 
 // set block on position in array GAME.pos
@@ -294,7 +296,7 @@ const leadingZero = (nr) => {
 };
 
 // TODO: victory
-const win = () => {
+const victory = () => {
   const again = $('<div class="win"></div>');
   const inside = $('<div class="again"></div>)');
   const btn = $('<button class="btn-again"> AGAIN ! </button>');

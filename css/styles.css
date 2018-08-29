@@ -69,12 +69,13 @@ body {
   position: relative;
   display: flex;
   background-size: contain;
-  background-image: url("../img/marble.png");
+  background-image: url("../img/m12.png");
 }
 
 
 .square h1 {
   pointer-events: none;
+  user-select: none;
   font-size: 3em;
 }
 
