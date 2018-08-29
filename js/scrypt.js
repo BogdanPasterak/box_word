@@ -11,7 +11,8 @@ const GAME = {
   letters: [],
   pos: [],
   words: [],
-  matchedWord: []
+  matchedWord: [],
+  moves: 0
   /*
 
   time: 0,
@@ -57,6 +58,8 @@ const restart = () => {
     resetBoard();
   } while ( win() );
   // not too easy
+  GAME.moves = 0;
+  document.getElementById('moves').innerHTML ='0';
 };
 
 // TODO: Function for redrawing the board
@@ -142,6 +145,8 @@ const clickLeter = (e) => {
     GAME.pos[where] = nr;
     GAME.pos[pos] = -1;
     move(nr);
+    GAME.moves++;
+    document.getElementById('moves').innerHTML = GAME.moves;
   }
   if (word = win())
     console.log(word);
@@ -196,11 +201,11 @@ const randomLetters = () => {
   const vowel = ['a','e','i','o','u'];
   const bcd = 'bcdfghjklmnpqrstvwxyz';
   const l = [];
-  let v = 0, c = 0, char, p, exp, ex2, ex3;
+  const list = document.getElementById('words');
+  let v = 0, c = 0, char, p, exp, ex2, ex3, node;
   let matchedWord;
 
   const word = GAME.words[((Math.random() * GAME.words.length) | 0)].w;
-  document.getElementById('text').value = word;
 
   // random word and count noumber of vowel
   for (var i = 0; i < 4; i++) {
@@ -244,6 +249,19 @@ const randomLetters = () => {
 
   // json to array
   GAME.matchedWord = matchedWord.map(word => word.w);
+
+  list.innerHTML = '';
+  node = document.createElement('OPTION');
+  node.setAttribute('value', '');
+  node.appendChild(document.createTextNode(''));
+  list.append(node);
+
+  GAME.matchedWord.forEach((word) => {
+    node = document.createElement('OPTION');
+    node.setAttribute('value', word);
+    node.appendChild(document.createTextNode(word));
+    list.append(node);
+  });
 
   return l;
 };
