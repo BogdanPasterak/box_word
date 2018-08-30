@@ -12,7 +12,8 @@ const GAME = {
   pos: [],
   words: [],
   matchedWord: [],
-  moves: 0
+  moves: 0,
+  blockade: false
   /*
 
   time: 0,
@@ -47,9 +48,12 @@ $(function() {
 
 // TODO: start again
 const restart = () => {
+  const board = document.getElementById('board');
   // DB words
   if (GAME.words.length == 0) {
     GAME.words = JSON.parse(words);
+    board.addEventListener('mouseup', released);
+    board.addEventListener('touchend', released);
   }
   do {
     // array letters (matchedWord => possible layouts)
@@ -83,6 +87,8 @@ const resetBoard = () => {
     block.style.backgroundImage = 'url(./img/m' + (10 + index) + '.png)';
     block.addEventListener('mousedown', clickLeter);
     block.addEventListener('touchstart', clickLeter);
+    // block.addEventListener('mouseup', released);
+    // block.addEventListener('touchend', released);
     board.append(block);
     GAME.blocks.push(block);
     GAME.pos[index] = index;
@@ -132,6 +138,10 @@ const reorganization = () => {
   }
 };
 
+const released = (e) => {
+  console.log('released');
+  GAME.blockade = false;
+};
 const clickLeter = (e) => {
   //console.log(e.target);
   const nr = parseInt(e.target.id.slice(1));
@@ -139,18 +149,24 @@ const clickLeter = (e) => {
   const neigh = neighbors(pos);
   let word, n;
 
-  if (neigh.includes(-1)) {
-    const where = GAME.pos.indexOf(-1);
-    // swap
-    GAME.pos[where] = nr;
-    GAME.pos[pos] = -1;
-    move(nr);
-    GAME.moves++;
-    document.getElementById('moves').innerHTML = GAME.moves;
-  }
-  if (word = win())
-    console.log(word);
+  if (! GAME.blockade) {
 
+    if (neigh.includes(-1)) {
+      const where = GAME.pos.indexOf(-1);
+      // swap
+      console.log('click');
+      GAME.blockade = true;
+      GAME.pos[where] = nr;
+      GAME.pos[pos] = -1;
+      move(nr);
+      GAME.moves++;
+      document.getElementById('moves').innerHTML = GAME.moves;
+    } else {
+      console.log('shakes');
+    }
+    if (word = win())
+      console.log(word);
+  }
 };
 
 // check if win
