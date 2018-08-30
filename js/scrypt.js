@@ -53,7 +53,7 @@ const restart = () => {
   if (GAME.words.length == 0) {
     GAME.words = JSON.parse(words);
     board.addEventListener('mouseup', released);
-    board.addEventListener('touchend', released);
+    //board.addEventListener('touchend', released);
   }
   do {
     // array letters (matchedWord => possible layouts)
@@ -86,7 +86,7 @@ const resetBoard = () => {
     block.style.height = GAME.side +'px';
     block.style.backgroundImage = 'url(./img/m' + (10 + index) + '.png)';
     block.addEventListener('mousedown', clickLeter);
-    block.addEventListener('touchstart', clickLeter);
+    //block.addEventListener('touchstart', clickLeter);
     // block.addEventListener('mouseup', released);
     // block.addEventListener('touchend', released);
     board.append(block);
