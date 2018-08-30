@@ -13,18 +13,19 @@ const GAME = {
   words: [],
   matchedWord: [],
   moves: 0,
-  blockade: false
-  /*
-
-  time: 0,
+  blockade: false,
   intervalID: undefined,
-  intervalOvations: undefined,
-  */
+  time: 0,
+  mobi: false
 };
 
 
 // TODO: Registration of new events and initialization
 $(function() {
+  GAME.mobi = function() {
+    try{ document.createEvent("TouchEvent"); return true; }
+    catch(e){ return false; }
+  }();
 
   // spreading the elements of the game (for phones in the landscape position )
   $( window ).resize(function() {
@@ -52,8 +53,9 @@ const restart = () => {
   // DB words
   if (GAME.words.length == 0) {
     GAME.words = JSON.parse(words);
-    board.addEventListener('mouseup', released);
-    //board.addEventListener('touchend', released);
+    if (GAME.mobi) board.addEventListener('touchend', released);
+    else board.addEventListener('mouseup', released);
+
   }
   do {
     // array letters (matchedWord => possible layouts)
@@ -64,6 +66,13 @@ const restart = () => {
   // not too easy
   GAME.moves = 0;
   document.getElementById('moves').innerHTML ='0';
+  // stop clock
+  if (GAME.intervalID != undefined) {
+    clearInterval(GAME.intervalID);
+    GAME.intervalID = undefined;
+  }
+  GAME.time = 0;
+  document.getElementById('time').innerHTML = '0:00';
 };
 
 // TODO: Function for redrawing the board
@@ -85,10 +94,8 @@ const resetBoard = () => {
     block.style.width = GAME.side +'px';
     block.style.height = GAME.side +'px';
     block.style.backgroundImage = 'url(./img/m' + (10 + index) + '.png)';
-    block.addEventListener('mousedown', clickLeter);
-    //block.addEventListener('touchstart', clickLeter);
-    // block.addEventListener('mouseup', released);
-    // block.addEventListener('touchend', released);
+    if (GAME.mobi) block.addEventListener('touchstart', clickLeter);
+    else block.addEventListener('mousedown', clickLeter);
     board.append(block);
     GAME.blocks.push(block);
     GAME.pos[index] = index;
@@ -139,7 +146,7 @@ const reorganization = () => {
 };
 
 const released = (e) => {
-  console.log('released');
+  //console.log('released');
   GAME.blockade = false;
 };
 const clickLeter = (e) => {
@@ -152,9 +159,13 @@ const clickLeter = (e) => {
   if (! GAME.blockade) {
 
     if (neigh.includes(-1)) {
+      // start clock if stoped
+      if (GAME.intervalID == undefined ){
+        GAME.intervalID = setInterval(addSecond, 1000);
+      }
+
       const where = GAME.pos.indexOf(-1);
       // swap
-      console.log('click');
       GAME.blockade = true;
       GAME.pos[where] = nr;
       GAME.pos[pos] = -1;
@@ -162,11 +173,37 @@ const clickLeter = (e) => {
       GAME.moves++;
       document.getElementById('moves').innerHTML = GAME.moves;
     } else {
-      console.log('shakes');
+      //console.log('shakes');
     }
-    if (word = win())
+    if (word = win()) {
       console.log(word);
+      // stop clock
+      if (GAME.intervalID != undefined) {
+        clearInterval(GAME.intervalID);
+        GAME.intervalID = undefined;
+      }
+    }
   }
+};
+
+// TODO: Time counting timer
+const addSecond = () => {
+  let time, min, sec;
+
+  GAME.time++;
+  time = (GAME.time / 3600) | 0;
+  min = ((GAME.time % 3600) / 60 ) | 0;
+  sec = GAME.time % 60;
+
+  time = ((time == 0) ? min : time + ':' + leadingZero(min)) + ':' + leadingZero(sec);
+  // show time
+  document.getElementById('time').innerHTML = time;
+  // also show stars
+};
+
+// TODO: Adds a leading zero
+const leadingZero = (nr) => {
+  return ((nr < 10) ? '0' : '') + nr;
 };
 
 // check if win
@@ -282,23 +319,6 @@ const randomLetters = () => {
   return l;
 };
 
-
-// TODO: Time counting timer
-const addSecond = () => {
-  let time, min, sec;
-
-  cards.time++;
-  time = (cards.time / 3600) | 0;
-  min = ((cards.time % 3600) / 60 ) | 0;
-  sec = cards.time % 60;
-
-  time = ((time == 0) ? min : time + ':' + leadingZero(min)) + ':' + leadingZero(sec);
-  // show time
-  $('#time').html(time);
-  // also show stars
-  calcStars();
-};
-
 // TODO: Drowing a stars
 const calcStars = (nr) => {
   const place = $('.stars');
@@ -322,11 +342,6 @@ const calcStars = (nr) => {
     }
     $(place).append(star);
   }
-};
-
-// TODO: Adds a leading zero
-const leadingZero = (nr) => {
-  return ((nr < 10) ? '0' : '') + nr;
 };
 
 // TODO: victory
