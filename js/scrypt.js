@@ -35,12 +35,6 @@ $(function() {
   $('button').click(function() {
     restart();
   });
-  $('#couples').change(function() {
-    choiceCouples();
-  });
-  $('#stakes').change(function() {
-    choiceStakes();
-  });
   restart();
   // start !
   reorganization();
@@ -174,6 +168,10 @@ const clickLeter = (e) => {
       document.getElementById('moves').innerHTML = GAME.moves;
     } else {
       //console.log('shakes');
+      GAME.blocks[nr].style.animation = 'shake 100ms';
+      setTimeout(function(){
+        GAME.blocks[nr].style.animation = 'none';
+      }, 100);
     }
     if (word = win()) {
       console.log(word);
