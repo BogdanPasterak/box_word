@@ -16,7 +16,8 @@ const GAME = {
   blockade: false,
   intervalID: undefined,
   time: 0,
-  mobi: false
+  mobi: false,
+  score: false
 };
 
 
@@ -168,13 +169,11 @@ const clickLeter = (e) => {
       document.getElementById('moves').innerHTML = GAME.moves;
     } else {
       //console.log('shakes');
-      GAME.blocks[nr].style.animation = 'shake 100ms';
-      setTimeout(function(){
-        GAME.blocks[nr].style.animation = 'none';
-      }, 100);
+      shake(nr);
     }
-    if (word = win()) {
-      console.log(word);
+    if ( win() ) {
+      //console.log(GAME.score);
+      show();
       // stop clock
       if (GAME.intervalID != undefined) {
         clearInterval(GAME.intervalID);
@@ -206,24 +205,74 @@ const leadingZero = (nr) => {
 
 // check if win
 const win = () => {
-let n, word;
+  let n, word, ch, score = new Array(11);
+  for (var i = 0; i < score.length; i++) { score[i] = new Array(4); }
 
   for (let row = 0; row < 4; row++) {
-    word = "";
+    //word = "";
     for (let col = 0; col < 4; col++) {
       n = row * 4 +col;
       if (GAME.pos[n] != -1) {
-       word += GAME.letters[GAME.pos[n]];
-     }
-    }
-    if (GAME.matchedWord.includes(word)){
-      for (var i = row * 4; i < row * 4 + 4; i++) {
-        GAME.blocks[GAME.pos[i]].style.color = 'red';
+        ch = GAME.letters[GAME.pos[n]];
+        // row
+        score[row][col] = ch;
+        // col
+        score[col + 4][row] = ch;
+        // scowl 3 of 4
+        if (row == col) score[8][row] = ch;
+        if (row + col == 3) {
+          score[9][row] = ch;
+          score[10][col] = ch;
+        }
+        //word += GAME.letters[GAME.pos[n]];
       }
-      return word;;
     }
   }
-  return false;
+
+  GAME.score = score.map(s => s.join(''));
+  score = GAME.score.filter(s => s.length == 4);
+  score = score.filter(s => GAME.matchedWord.includes(s));
+
+  //console.log(score);
+  return score.length > 0;
+};
+
+const show = () => {
+  p = new Array(16);
+  for (var i = 0; i < 16; i++) { p[i] = false; }
+
+  for ( let i = 0; i < 4; i++){
+    if ( GAME.score[i].length == 4 && GAME.matchedWord.includes(GAME.score[i]) ) {
+      p[i * 4] = true; p[i * 4 + 1] = true; p[i * 4 + 2] = true; p[i * 4 + 3] = true;
+    }
+    if ( GAME.score[i + 4].length == 4 && GAME.matchedWord.includes(GAME.score[i + 4]) ) {
+      p[i] = true; p[i + 4] = true; p[i + 8] = true; p[i + 12] = true;
+    }
+  }
+  if ( GAME.score[8].length == 4 && GAME.matchedWord.includes(GAME.score[8]) ) {
+    p[0] = true; p[5] = true; p[10] = true; p[15] = true;
+  }
+  if ( GAME.score[9].length == 4 &&
+      (GAME.matchedWord.includes(GAME.score[9]) || GAME.matchedWord.includes(GAME.score[10]))) {
+    p[3] = true; p[6] = true; p[9] = true; p[12] = true;
+  }
+
+  //console.log(p);
+  for (var i = 0; i < p.length; i++) {
+    if (p[i]) {
+      GAME.blocks[GAME.pos[i]].style.color = 'red';
+      shake(GAME.pos[i],500);
+    }
+  }
+};
+
+const shake = (nr, t = 100) => {
+  const block = GAME.blocks[nr];
+
+  block.style.animation = 'shake ' + t + 'ms';
+  setTimeout(function() {
+    block.style.animation = 'none';
+  }, t);
 };
 
 // set block on position in array GAME.pos
