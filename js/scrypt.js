@@ -28,6 +28,9 @@ $(function() {
     catch(e){ return false; }
   }();
 
+
+  //howManyMovesPromise('dupa').then(() => (console.log('Po ptokach')));
+
   // spreading the elements of the game (for phones in the landscape position )
   $( window ).resize(function() {
     reorganization();
@@ -37,6 +40,8 @@ $(function() {
     restart();
   });
   restart();
+
+  howManyMoves(GAME.matchedWord[0]);
   // start !
   reorganization();
   //choiceCouples();
@@ -390,6 +395,96 @@ const calcStars = (nr) => {
     $(place).append(star);
   }
 };
+
+
+
+const howManyMoves = (word) => {
+
+  console.log(word);
+  let p = GAME.pos.slice();
+  p[15] = 14;
+  p[14] = -1;
+
+  let ans = recurent([], p);
+
+  console.log('Wynik Koncowy');
+  console.log(ans);
+
+};
+
+const DEPTH = 2;
+
+const recurent = (moves, pos) => {
+
+  if (moves.length == 2 && moves[0] == 'right' && moves[1] == 'down') {
+    console.log('Jest !!! ---------------------------------');
+    return moves;
+  }
+  if (moves.length > DEPTH) {
+    moves.push('stop');
+    return moves;
+  }
+
+  let way = [];
+  let empty = pos.indexOf(-1);
+
+  if (empty > 3) way.push('down');
+  if (empty < 12) way.push('up');
+  if (empty % 4) way.push('right');
+  if (empty % 4 < 3) way.push('left');
+  console.log('pozycje w recurent plus byłe ruchy ,   poziom : ' + moves.length);
+  //console.log(way);
+  console.log(pos);
+  console.log(moves);
+
+  let movesN, posN, movesA , movesB;
+
+
+  way.forEach(function(d) {
+    movesN = moves.slice();
+    posN = pos.slice();
+
+    switch (d) {
+      case 'right':
+      console.log('w petli drog jazda w prawo');
+      posN[empty] = posN[empty - 1];
+      posN[empty - 1] = -1;
+      movesN.push(d);
+      movesA = recurent(movesN, posN);
+      break;
+      case 'down':
+      console.log('w petli drog jazda w duł');
+      posN[empty] = posN[empty - 4];
+      posN[empty - 4] = -1;
+      movesN.push(d);
+      movesB = recurent(movesN, posN);
+      break;
+    }
+
+
+
+  });
+  console.log('A');
+  console.log(movesA);
+  console.log('B');
+  console.log(movesB);
+
+  //moves.push(moves.length);
+
+  return movesA;
+};
+
+
+const howManyMovesPromise = (word) => {
+  return new Promise(function(r) {
+    console.log('3 sekund ' + word);
+    window.setTimeout(function() {
+      r();
+    }, 3000);
+  });
+
+};
+
 
 // TODO: victory
 const victory = () => {
