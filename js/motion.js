@@ -2,9 +2,15 @@
 
 const Motion = function(parent, move) {
 
+	if (Motion.count == undefined) Motion.count = 0;
+	else Motion.count++;
+
+
 	this.level;
 	this.pos = [];
 	this.empty = 0;
+	this.parentId = -1;
+	this.id = Motion.count;
 
 	if (parent == undefined) {
 		this.level = 0;
@@ -17,6 +23,7 @@ const Motion = function(parent, move) {
 		this.pos[this.empty] = this.pos[this.empty + move];
 		this.empty += move;
 		this.pos[this.empty] = -1;
+		this.parentId = parent.id;
 	}
 
 };

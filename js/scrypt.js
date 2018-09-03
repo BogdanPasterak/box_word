@@ -45,6 +45,9 @@ $(function() {
 
 const test = () => {
 
+  let is = false;
+
+
   let motions = [];
   motions.push(new Motion());
   let i = 0;
@@ -53,18 +56,24 @@ const test = () => {
   // kolejny ruch
   do {
     // wszystkie ruchy wczesniejsze o 1
-    let a = motions.filter( m => (m.level == i)).map( m => (
+    motions.filter( (m) => (m.level == i)).forEach( (m) => {
       // karzdy dopuszczalny kierunek
-      m.moves().map( d => (
+      m.moves().forEach( (d) => {
         // jesli jeszcze takiego nie było
-        nm = new Motion( m, d),
-        (motions.some(el => el.equals(nm))) ? '' : motions.push(nm)
-      ))
-      //motions.push( new Motion( m, m.moves()[0]))
-    ));
-
+        nm = new Motion( m, d);
+        //dodaj do zestawu
+        if ( ! motions.some( el => el.equals(nm) )) motions.push(nm);
+      });
+    });
     i++;
-  } while (i < 4);
+    motions.filter( m => (m.level == i)).forEach( (m) => {
+      if (win(m.pos)) {
+        console.log(m);
+        is = true;
+      }
+    });
+
+  } while (i < 10 && ! is);
 
   console.log(motions);
 };
@@ -84,7 +93,7 @@ const restart = () => {
     GAME.letters = randomLetters();
     // draw blocks
     resetBoard();
-  } while ( win() );
+  } while ( win(GAME.pos) );
   // not too easy
   GAME.moves = 0;
   document.getElementById('moves').innerHTML ='0';
@@ -198,7 +207,7 @@ const clickLeter = (e) => {
       //console.log('shakes');
       shake(nr);
     }
-    if ( win() ) {
+    if ( win(GAME.pos) ) {
       //console.log(GAME.score);
       show();
       // stop clock
@@ -231,7 +240,7 @@ const leadingZero = (nr) => {
 };
 
 // check if win
-const win = () => {
+const win = (pos) => {
   let n, word, ch, score = new Array(11);
   for (var i = 0; i < score.length; i++) { score[i] = new Array(4); }
 
@@ -239,8 +248,8 @@ const win = () => {
     //word = "";
     for (let col = 0; col < 4; col++) {
       n = row * 4 +col;
-      if (GAME.pos[n] != -1) {
-        ch = GAME.letters[GAME.pos[n]];
+      if (pos[n] != -1) {
+        ch = GAME.letters[pos[n]];
         // row
         score[row][col] = ch;
         // col
@@ -251,7 +260,7 @@ const win = () => {
           score[9][row] = ch;
           score[10][col] = ch;
         }
-        //word += GAME.letters[GAME.pos[n]];
+        //word += GAME.letters[pos[n]];
       }
     }
   }
