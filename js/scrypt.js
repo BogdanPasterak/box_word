@@ -38,6 +38,12 @@ $(function() {
   });
   restart();
   // start !
+  let m = new Motion();
+  let m1 = new Motion(m, -1);
+  let m2 = new Motion(m1, 1);
+  console.log(m.equals(m2));
+
+
   reorganization();
   //choiceCouples();
 });
