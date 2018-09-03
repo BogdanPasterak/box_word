@@ -4,18 +4,20 @@ const Motion = function(parent, move) {
 
 	this.level;
 	this.pos = [];
+	this.empty = 0;
 
 	if (parent == undefined) {
 		this.level = 0;
 		this.pos = GAME.pos.map(p => (p));
+		this.empty = this.pos.indexOf(-1);
 	} else {
 		this.level = parent.level + 1;
 		this.pos = parent.pos.map(p => (p));
-		let empty = this.pos.indexOf(-1);
-		this.pos[empty] = this.pos[empty + move];
-		this.pos[empty + move] = -1;
+		this.empty = this.pos.indexOf(-1);
+		this.pos[this.empty] = this.pos[this.empty + move];
+		this.empty += move;
+		this.pos[this.empty] = -1;
 	}
-	console.log(this);
 
 };
 
@@ -25,4 +27,18 @@ Motion.prototype.equals = function(m) {
 	return ! this.pos.some(function(p, i) {
 		return p != m.pos[i];
 	});
+};
+
+
+Motion.prototype.moves = function() {
+  let d = [];
+	//console.log(this);
+
+  if (this.empty < 12) d.push(4);
+  if (this.empty > 3) d.push(-4);
+  if (this.empty % 4 > 0) d.push(-1);
+  if (this.empty % 4 < 3) d.push(1);
+
+  //console.log(this.empty)
+  return d;
 };

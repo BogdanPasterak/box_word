@@ -33,20 +33,41 @@ $(function() {
     reorganization();
   });
   // events for button and selects
-  $('button').click(function() {
-    restart();
-  });
+  document.getElementById('restart').addEventListener("click", restart );
+
   restart();
   // start !
-  let m = new Motion();
-  let m1 = new Motion(m, -1);
-  let m2 = new Motion(m1, 1);
-  console.log(m.equals(m2));
-
+  document.getElementById('test').addEventListener("click", test );
 
   reorganization();
   //choiceCouples();
 });
+
+const test = () => {
+
+  let motions = [];
+  motions.push(new Motion());
+  let i = 0;
+  let nm = {};
+
+  // kolejny ruch
+  do {
+    // wszystkie ruchy wczesniejsze o 1
+    let a = motions.filter( m => (m.level == i)).map( m => (
+      // karzdy dopuszczalny kierunek
+      m.moves().map( d => (
+        // jesli jeszcze takiego nie było
+        nm = new Motion( m, d),
+        (motions.some(el => el.equals(nm))) ? '' : motions.push(nm)
+      ))
+      //motions.push( new Motion( m, m.moves()[0]))
+    ));
+
+    i++;
+  } while (i < 4);
+
+  console.log(motions);
+};
 
 // TODO: start again
 const restart = () => {
