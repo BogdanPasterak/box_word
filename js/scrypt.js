@@ -37,45 +37,68 @@ $(function() {
 
   restart();
   // start !
-  document.getElementById('test').addEventListener("click", test );
+  document.getElementById('test').addEventListener("click", difficulty );
 
   reorganization();
   //choiceCouples();
 });
 
-const test = () => {
+const difficulty = () => {
+  const MAX_MOVEMENTS = 10;
+  let numberOfMoves = 0,
+    newMoves = {};
 
-  let is = false;
-
+  let words,wordsBefore;
 
   let motions = [];
   motions.push(new Motion());
-  let i = 0;
-  let nm = {};
 
-  // kolejny ruch
+  // loop of movements
   do {
-    // wszystkie ruchy wczesniejsze o 1
-    motions.filter( (m) => (m.level == i)).forEach( (m) => {
-      // karzdy dopuszczalny kierunek
-      m.moves().forEach( (d) => {
-        // jesli jeszcze takiego nie było
-        nm = new Motion( m, d);
-        //dodaj do zestawu
-        if ( ! motions.some( el => el.equals(nm) )) motions.push(nm);
+    // Select all movements at this level
+    motions.filter( (motion) => (motion.level == numberOfMoves)).forEach( (motion) => {
+      // Possible next movements
+      motion.moves().forEach( (d) => {
+        // make a new one
+        newMoves = new Motion( motion, d);
+        // if there is no before, add
+        if ( ! motions.some( m => m.equals(newMoves) )) motions.push(newMoves);
       });
     });
-    i++;
-    motions.filter( m => (m.level == i)).forEach( (m) => {
-      if (win(m.pos)) {
-        console.log(m);
-        is = true;
+    // next level (new moves)
+    numberOfMoves++;
+    words = [];
+
+    motions.filter( motion => (motion.level == numberOfMoves)).forEach( (motion) => {
+      if ( win(motion.pos) ) {
+        for (let w of GAME.score) {
+          if (w.length == 4 && GAME.matchedWord.includes(w))
+            words.push(w);
+        }
       }
     });
 
-  } while (i < 10 && ! is);
+    if (words.length){
+      if (numberOfMoves == MAX_MOVEMENTS) {
+        //console.log('Last level ' + '   unique Matched');
+        words = words.unique().filter((w) => ! wordsBefore.includes(w));
+        //console.log(words);
+      } else {
+        //console.log('Matched ' + '   level ' + numberOfMoves);
+        wordsBefore = words.unique();
+        //console.log(wordsBefore);
+      }
+    }
 
-  console.log(motions);
+  } while (numberOfMoves < MAX_MOVEMENTS );
+
+  console.log(words);
+
+  return words;
+};
+
+Array.prototype.unique = function() {
+  return this.filter((v, n, a) => a.indexOf(v) === n);
 };
 
 // TODO: start again
