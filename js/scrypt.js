@@ -11,6 +11,7 @@ const GAME = {
   letters: [],
   pos: [],
   words: [],
+  word: '',
   matchedWord: [],
   moves: 0,
   blockade: false,
@@ -37,7 +38,7 @@ $(function() {
 
   restart();
   // start !
-  document.getElementById('test').addEventListener("click", difficulty );
+  // document.getElementById('test').addEventListener("click", difficulty );
 
   reorganization();
   //choiceCouples();
@@ -48,7 +49,7 @@ const difficulty = () => {
   let numberOfMoves = 0,
     newMoves = {};
 
-  let words,wordsBefore;
+  let words,wordsBefore = [];
 
   let motions = [];
   motions.push(new Motion());
@@ -79,7 +80,7 @@ const difficulty = () => {
     });
 
     if (words.length){
-      if (numberOfMoves == MAX_MOVEMENTS) {
+      if (numberOfMoves == MAX_MOVEMENTS && wordsBefore.length) {
         //console.log('Last level ' + '   unique Matched');
         words = words.unique().filter((w) => ! wordsBefore.includes(w));
         //console.log(words);
@@ -92,9 +93,16 @@ const difficulty = () => {
 
   } while (numberOfMoves < MAX_MOVEMENTS );
 
-  console.log(words);
-
-  return words;
+  if (words.length) {
+    GAME.word = words[(Math.random() * words.length) | 0];
+    GAME.word.split('').map((c,i) => (
+      document.getElementById('l' + i).innerHTML = c
+    ));
+    console.log(GAME.word);
+    return true;
+  } else {
+    return false;
+  }
 };
 
 Array.prototype.unique = function() {
@@ -116,7 +124,7 @@ const restart = () => {
     GAME.letters = randomLetters();
     // draw blocks
     resetBoard();
-  } while ( win(GAME.pos) );
+  } while ( ! difficulty() );
   // not too easy
   GAME.moves = 0;
   document.getElementById('moves').innerHTML ='0';
@@ -230,7 +238,7 @@ const clickLeter = (e) => {
       //console.log('shakes');
       shake(nr);
     }
-    if ( win(GAME.pos) ) {
+    if ( win(GAME.pos) && GAME.score.includes(GAME.word) ) {
       //console.log(GAME.score);
       show();
       // stop clock
@@ -293,13 +301,13 @@ const win = (pos) => {
   score = score.filter(s => GAME.matchedWord.includes(s));
 
   //console.log(score);
-  return score.length > 0;
+  return score.length;
 };
 
 const show = () => {
   p = new Array(16);
   for (var i = 0; i < 16; i++) { p[i] = false; }
-
+/* all matches
   for ( let i = 0; i < 4; i++){
     if ( GAME.score[i].length == 4 && GAME.matchedWord.includes(GAME.score[i]) ) {
       p[i * 4] = true; p[i * 4 + 1] = true; p[i * 4 + 2] = true; p[i * 4 + 3] = true;
@@ -323,6 +331,30 @@ const show = () => {
       shake(GAME.pos[i],500);
     }
   }
+  */
+  for ( let i = 0; i < 4; i++){
+    if ( GAME.score[i] == GAME.word ) {
+      p[i * 4] = true; p[i * 4 + 1] = true; p[i * 4 + 2] = true; p[i * 4 + 3] = true;
+    }
+    if ( GAME.score[i + 4] == GAME.word ) {
+      p[i] = true; p[i + 4] = true; p[i + 8] = true; p[i + 12] = true;
+    }
+  }
+  if ( GAME.score[8] == GAME.word ) {
+    p[0] = true; p[5] = true; p[10] = true; p[15] = true;
+  }
+  if ( GAME.score[9] == GAME.word ||  GAME.score[10] == GAME.word ) {
+    p[3] = true; p[6] = true; p[9] = true; p[12] = true;
+  }
+
+  //console.log(p);
+  for (var i = 0; i < p.length; i++) {
+    if (p[i]) {
+      GAME.blocks[GAME.pos[i]].style.color = 'red';
+      shake(GAME.pos[i],500);
+    }
+  }
+
 };
 
 const shake = (nr, t = 100) => {
@@ -360,7 +392,9 @@ const randomLetters = () => {
   const vowel = ['a','e','i','o','u'];
   const bcd = 'bcdfghjklmnpqrstvwxyz';
   const l = [];
-  const list = document.getElementById('words');
+
+// remove list
+  // const list = document.getElementById('words');
   let v = 0, c = 0, char, p, exp, ex2, ex3, node;
   let matchedWord;
 
@@ -409,17 +443,17 @@ const randomLetters = () => {
   // json to array
   GAME.matchedWord = matchedWord.map(word => word.w);
 
-  list.innerHTML = '';
+  // list.innerHTML = '';
   node = document.createElement('OPTION');
   node.setAttribute('value', '');
   node.appendChild(document.createTextNode(''));
-  list.append(node);
+  // list.append(node);
 
   GAME.matchedWord.forEach((word) => {
     node = document.createElement('OPTION');
     node.setAttribute('value', word);
     node.appendChild(document.createTextNode(word));
-    list.append(node);
+    // list.append(node);
   });
 
   return l;

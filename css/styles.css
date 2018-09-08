@@ -11,9 +11,9 @@ body,
 }
 
 body {
-  width: calc(100% - 16px);
-  height: calc(100% - 16px);
-  padding: 8px;
+  width: calc(100% - 24px);
+  height: calc(100% - 24px);
+  padding: 12px;
   background-image: repeating-linear-gradient(20deg, #dde , #ded 33%, #edd 66%);;
 }
 
@@ -56,6 +56,19 @@ body {
   display: flex;
   flex: 1 1 auto;
   width: 100%;
+}
+
+#word {
+  font-size: 2em;
+  display: flex;
+  flex-grow: 0.6;
+  flex-flow: row;
+  min-height: 1.3em;
+}
+
+.letter {
+  position: relative;
+  margin-right: .3em;
 }
 
 .square {
@@ -204,47 +217,6 @@ hr {
   box-shadow: inset 0 12px 12px -12px rgba(0, 0, 0, 0.5);
 }
 
-/* divs for hat*/
-.hat-box {
-  position: absolute;
-  top: 710px;
-  left: 0;
-  pointer-events: none;
-}
-
-.hat-X {
-  position: relative;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  animation-name: moveX;
-  animation-duration: 1s;
-  animation-timing-function: linear;
-}
-
-.hat-Y {
-  position: relative;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  animation-name: moveY0;
-  animation-duration: 1s;
-  animation-timing-function: ease-out;
-}
-
-.hat {
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 70px;
-  height: 70px;
-  pointer-events: none;
-  background-image: url("../img/hat0.png");
-  background-size: contain;
-  animation-duration: 1s;
-  animation-timing-function: linear;
-}
-
 .win {
   width: 70%;
   margin: 10% 15%;
@@ -280,7 +252,6 @@ hr {
 
 
 /* breakpoints */
-/* change audience */
 @media screen and (max-width: 720px) {
   #container {
     font-size: 0.9em;
@@ -310,4 +281,17 @@ hr {
   75% { transform: rotate(-7deg); }
   90% { transform: rotate(7deg); }
   100% { transform: rotate(0deg); }
+}
+
+#l0 { animation: float 5s cubic-bezier(.5,0,.2,1) infinite; }
+#l1 { animation: float 5s cubic-bezier(.4,0,.3,1) infinite; }
+#l2 { animation: float 5s cubic-bezier(.3,0,.4,1) infinite; }
+#l3 { animation: float 5s cubic-bezier(.2,0,.5,1) infinite; }
+
+@keyframes float {
+    0% {left: 0;}
+    25% {transform: rotate(20deg);}
+    50% {left: calc(100% - 2.5em);}
+    75% {transform: rotate(-20deg);}
+    100% {left: 0;}
 }
