@@ -94,6 +94,15 @@ body {
   flex-flow: wrap;
 }
 
+#tight {
+  padding: 0;
+  justify-content: space-around;
+}
+
+#loose {
+  display: contents;
+}
+
 /* columns or rows inside board */
 .my-col {
   display: flex;
@@ -252,7 +261,7 @@ hr {
 
 
 /* breakpoints */
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 750px), (max-height: 400px) {
   #container {
     font-size: 0.9em;
   }

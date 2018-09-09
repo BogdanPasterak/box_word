@@ -33,6 +33,13 @@ $(function() {
   $( window ).resize(function() {
     reorganization();
   });
+
+  /*
+  window.addEventListener("orientationchange", function() {
+    reorganization();
+  });
+  */
+
   // events for button and selects
   document.getElementById('restart').addEventListener("click", restart );
 
@@ -173,7 +180,7 @@ const reorganization = () => {
   const right = document.getElementById('my-col-right');
 
   // putting playground to the side
-  if ( screen.width > screen.height && screen.width < 720) {
+  if ( screen.width > screen.height && screen.width < 750 || screen.height < 400) {
    if ( left.contains(playground) ) {
       left.style.width = "40%";
       right.style.width = "57%";
@@ -205,6 +212,28 @@ const reorganization = () => {
       move(index);
     });
   }
+
+  const word = document.getElementById('word');
+  const tightly = word.clientWidth / word.clientHeight;
+  const clearance = rect.height / rect.width;
+
+    console.log(word.getBoundingClientRect().width + '   ' + word.clientWidth);
+    console.log(clearance + '   ' + tightly);
+    console.log(word);
+
+
+  if ( clearance > 1.25 || tightly < 4 ) {
+    if (word.parentNode.id == 'loose') {
+      document.getElementById('tight').append(word);
+      console.log('przenosze do tight');
+    }
+  } else if ( tightly > 7 ) {
+    if ( word.parentNode.id == 'tight' ) {
+      document.getElementById('loose').append(word);
+      console.log('przenosze do loose');
+    }
+  }
+
 };
 
 const released = (e) => {
