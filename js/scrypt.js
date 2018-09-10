@@ -41,15 +41,35 @@ $(function() {
   */
 
   // events for button and selects
+  document.getElementById('reset').addEventListener("click", reset );
+
+  // events for button and selects
   document.getElementById('restart').addEventListener("click", restart );
 
-  restart();
+  reset();
   // start !
   // document.getElementById('test').addEventListener("click", difficulty );
 
   reorganization();
   //choiceCouples();
 });
+
+
+const restart = () => {
+  GAME.pos = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,-1];
+  GAME.blocks.map((b,i) => move(i));
+
+  GAME.moves = 0;
+  document.getElementById('moves').innerHTML = '0';
+
+  if (GAME.intervalID != undefined) {
+    clearInterval(GAME.intervalID);
+    GAME.intervalID = undefined;
+  }
+  GAME.time = 0;
+  document.getElementById('time').innerHTML = '0:00';
+
+};
 
 const difficulty = () => {
   const MAX_MOVEMENTS = 10;
@@ -117,7 +137,7 @@ Array.prototype.unique = function() {
 };
 
 // TODO: start again
-const restart = () => {
+const reset = () => {
   const board = document.getElementById('board');
   // DB words
   if (GAME.words.length == 0) {
@@ -126,6 +146,7 @@ const restart = () => {
     else board.addEventListener('mouseup', released);
 
   }
+  restart();
   do {
     // array letters (matchedWord => possible layouts)
     GAME.letters = randomLetters();
@@ -150,7 +171,6 @@ const resetBoard = () => {
   // clear board
   board.innerHTML = '';
   GAME.blocks = [];
-  GAME.pos = new Array(16);
 
   // build 15 blocks and set position
   for(var index = 0; index < 15; index++) {
@@ -167,9 +187,8 @@ const resetBoard = () => {
     else block.addEventListener('mousedown', clickLeter);
     board.append(block);
     GAME.blocks.push(block);
-    GAME.pos[index] = index;
   }
-  GAME.pos[15] = -1;
+
 };
 
 // TODO: resize window ( turning the phone )
@@ -213,24 +232,18 @@ const reorganization = () => {
     });
   }
 
+  // position of the floating inscription
   const word = document.getElementById('word');
   const tightly = word.clientWidth / word.clientHeight;
   const clearance = rect.height / rect.width;
 
-    console.log(word.getBoundingClientRect().width + '   ' + word.clientWidth);
-    console.log(clearance + '   ' + tightly);
-    console.log(word);
-
-
   if ( clearance > 1.25 || tightly < 4 ) {
     if (word.parentNode.id == 'loose') {
       document.getElementById('tight').append(word);
-      console.log('przenosze do tight');
     }
   } else if ( tightly > 7 ) {
     if ( word.parentNode.id == 'tight' ) {
       document.getElementById('loose').append(word);
-      console.log('przenosze do loose');
     }
   }
 
@@ -527,7 +540,7 @@ const victory = () => {
 
   $(btn).click(function() {
     $('.container')[0].style.filter = '';
-    restart();
+    reset();
     $(again).remove();
   });
 
