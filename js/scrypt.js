@@ -76,7 +76,7 @@ const difficulty = () => {
   let numberOfMoves = 0,
     newMoves = {};
 
-  let words,wordsBefore = [];
+  let words = [],wordsBefore = [];
 
   let motions = [];
   motions.push(new Motion());
@@ -95,7 +95,7 @@ const difficulty = () => {
     });
     // next level (new moves)
     numberOfMoves++;
-    words = [];
+    // words = [];
 
     motions.filter( motion => (motion.level == numberOfMoves)).forEach( (motion) => {
       if ( win(motion.pos) ) {
@@ -105,6 +105,8 @@ const difficulty = () => {
         }
       }
     });
+
+    words = words.unique();
 
     if (words.length){
       if (numberOfMoves == MAX_MOVEMENTS && wordsBefore.length) {
