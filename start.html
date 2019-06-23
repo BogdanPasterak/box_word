@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Box Word</title>
+    <meta name="author" content="Bogdan Pasterak">
+	<link href="css/styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Acme" rel="stylesheet">
+    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+</head>
+<body>
+  <div id="container">
+    <div id="my-col-left">
+      <!-- heading -->
+      <header class="my-part">
+        <h1>Box Word</h1>
+      </header>
+      <div class="my-part">
+        <hr>
+      </div>
+      <div class="my-part" id='tight'>
+      </div>
+      <div class="my-part">
+        <button type="button" id="restart">Restart</button>
+        <span><strong id="moves">0</strong> Moves</span>
+        <div id='loose'>
+          <div id='word'>
+            <div id='l0' class='letter'>l</div>
+            <div id='l1' class='letter'>a</div>
+            <div id='l2' class='letter'>t</div>
+            <div id='l3' class='letter'>e</div>
+          </div>
+        </div>
+        <!-- <select id="words"></select> -->
+        <span>Time: <strong id="time">0:00</strong></span>
+        <button type="button" id="reset">Reset</button>
+      </div>
+      <div id="playground">
+        <!-- board of game build dynamically -->
+        <div id="board">
+        </div>
+      </div>
+      <footer class="my-part" id="footer">
+        <p>
+          <span><a href="mailto:bogdanpasterak@gmail.com">Bogdan Pasterak</a></span>
+          <span>&copy; 2018</span>
+        </p>
+        <p>
+          <span><a href="https://github.com/BogdanPasterak" target="_blank">GitHub <i class="fab fa-github"></i></a></span>
+          <span><a href="https://www.linkedin.com/in/bogdan-pasterak-54b0b514a/" target="_blank">Linked <i class="fab fa-linkedin-in"></i></a></span>
+          <span><a href="https://www.facebook.com/" target="_blank">Facebook <i class="fab fa-facebook-f"></i></a></span>
+        </p>
+      </footer>
+    </div>
+    <div id="my-col-right">
+    </div>
+  </div> <!-- end of container -->
+  <!-- my scripts -->
+  <script src="js/jQuery v3.3.1.js"></script>
+  <script src="src/words999json.js"></script>
+  <script src="js/motion.js"></script>
+  <script src="js/scrypt.js"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+</body>
+</html>
